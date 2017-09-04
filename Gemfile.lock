@@ -1,0 +1,109 @@
+GIT
+  remote: https://github.com/dsexton/guard-go
+  revision: b021dd210060a0739027faa0e0001b59d28d9acb
+  specs:
+    guard-go (0.0.5)
+      childprocess (>= 0.3)
+      guard (>= 2.8.1)
+      sys-proctable (>= 0.9)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    arr-pm (0.0.10)
+      cabin (> 0)
+    backports (3.8.0)
+    cabin (0.9.0)
+    childprocess (0.7.1)
+      ffi (~> 1.0, >= 1.0.11)
+    clamp (1.0.1)
+    coderay (1.1.2)
+    dotenv (2.2.1)
+    em-websocket (0.5.1)
+      eventmachine (>= 0.12.9)
+      http_parser.rb (~> 0.6.0)
+    eventmachine (1.2.5)
+    ffi (1.9.18)
+    formatador (0.2.5)
+    fpm (1.9.2)
+      arr-pm (~> 0.0.10)
+      backports (>= 2.6.2)
+      cabin (>= 0.6.0)
+      childprocess
+      clamp (~> 1.0.0)
+      ffi
+      json (>= 1.7.7, < 2.0)
+      pleaserun (~> 0.0.29)
+      ruby-xz
+      stud
+    guard (2.14.1)
+      formatador (>= 0.2.4)
+      listen (>= 2.7, < 4.0)
+      lumberjack (~> 1.0)
+      nenv (~> 0.1)
+      notiffany (~> 0.0)
+      pry (>= 0.9.12)
+      shellany (~> 0.0)
+      thor (>= 0.18.1)
+    guard-compat (1.2.1)
+    guard-livereload (2.5.2)
+      em-websocket (~> 0.5)
+      guard (~> 2.8)
+      guard-compat (~> 1.0)
+      multi_json (~> 1.8)
+    http_parser.rb (0.6.0)
+    insist (1.0.0)
+    io-like (0.3.0)
+    json (1.8.6)
+    listen (3.1.5)
+      rb-fsevent (~> 0.9, >= 0.9.4)
+      rb-inotify (~> 0.9, >= 0.9.7)
+      ruby_dep (~> 1.2)
+    lumberjack (1.0.12)
+    method_source (0.8.2)
+    multi_json (1.12.1)
+    mustache (0.99.8)
+    nenv (0.3.0)
+    notiffany (0.1.1)
+      nenv (~> 0.1)
+      shellany (~> 0.0)
+    pleaserun (0.0.30)
+      cabin (> 0)
+      clamp
+      dotenv
+      insist
+      mustache (= 0.99.8)
+      stud
+    pry (0.10.4)
+      coderay (~> 1.1.0)
+      method_source (~> 0.8.1)
+      slop (~> 3.4)
+    rb-fchange (0.0.6)
+      ffi
+    rb-fsevent (0.10.2)
+    rb-inotify (0.9.10)
+      ffi (>= 0.5.0, < 2)
+    ruby-xz (0.2.3)
+      ffi (~> 1.9)
+      io-like (~> 0.3)
+    ruby_dep (1.5.0)
+    shellany (0.0.1)
+    slop (3.6.0)
+    stud (0.0.23)
+    sys-proctable (1.1.5-universal-aix-5)
+    thor (0.20.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  fpm
+  guard
+  guard-go!
+  guard-livereload (~> 2.5)
+  rb-fchange
+  rb-fsevent
+  rb-inotify
+
+BUNDLED WITH
+   1.15.4

@@ -1,0 +1,93 @@
+#!/bin/sh
+
+### BEGIN INIT INFO
+# Provides:          pac
+# Required-Start:    $local_fs $remote_fs $network
+# Required-Stop:     $local_fs $remote_fs $network
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: starts the pac service
+# Description:       starts pac using start-stop-daemon
+### END INIT INFO
+
+set -e
+
+. /lib/lsb/init-functions
+
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+DAEMON=/usr/bin/pac
+NAME=pac
+DESC="pac"
+USERNAME=pac
+
+if [ ! -e "/etc/default/pac" ];then
+    log_failure_msg "/etc/default/pac file not found"
+    log_end_msg 1
+    exit 1
+fi
+
+STOP_TIMEOUT=120
+PIDFILE=/var/run/${NAME}.pid
+DAEMON_OPTS="" # Set in defaults file
+LOGPATH="" # Set in defaults file
+
+. /etc/default/pac
+
+test "$ENABLED" != "0" || exit 0
+
+config_logger () {
+    if ! test -d $(dirname $LOGPATH); then
+        log_failure_msg "$(dirname $LOGPATH) is missing"
+        log_end_msg 1
+    fi
+    touch $PIDFILE
+    chown $USERNAME: $PIDFILE
+}
+
+test -x $DAEMON || exit 0
+
+CALL="exec"
+if [ ! -z ${CPULIST+x} ]; then
+    CALL="$CALL taskset -c $CPULIST"
+fi
+
+case "$1" in
+    start)
+        log_daemon_msg "Starting $DESC"
+        config_logger
+        if start-stop-daemon --start --quiet --chuid $USERNAME \
+            --make-pidfile --pidfile $PIDFILE --background \
+            --startas /bin/bash  --chdir / --oknodo \
+            -- -c "$CALL $DAEMON $DAEMON_OPTS >> $LOGPATH 2>&1"
+        then
+            log_end_msg 0
+        else
+            log_end_msg 1
+        fi
+        ;;
+
+    stop)
+        log_daemon_msg "Stopping $DESC"
+        if start-stop-daemon --stop --quiet --oknodo --pidfile $PIDFILE --retry $STOP_TIMEOUT; then
+            log_end_msg 0
+        else
+            log_end_msg 1
+        fi
+        ;;
+
+    restart|force-reload)
+        $0 stop
+        $0 start
+        ;;
+
+    status)
+        status_of_proc -p $PIDFILE "$DAEMON" $NAME && exit 0 || exit $?
+        ;;
+
+    *)
+        echo "Usage: $NAME {start|stop|restart|force-reload|status}" >&2
+        exit 1
+        ;;
+esac
+
+exit 0

@@ -8,16 +8,10 @@ build:
 
 deb: clean
 	GOOS=linux GOARCH=amd64 $(MAKE) build
-	fpm -t deb \
+	fpm \
+	 	-t deb \
 		-s dir \
 		-n $(appName) \
-		--version $(debVersion) \
-		--license "Copyright (c) 2016-$(shell date +%Y) Ceaser Larry. All rights reserved" \
-		--vendor "Ceaser Larry" \
-		--url "http://ca.utio.us" \
-		--category misc \
-		--deb-priority optional \
-		--maintainer "Ceaser Larry <c@utio.us>" \
 		--architecture amd64 \
 		--description "PAC configuration" \
 		--deb-changelog debian/changelog \
@@ -25,10 +19,29 @@ deb: clean
 		--deb-init debian/$(appName).init  \
 		--deb-default debian/$(appName).default \
 		--package $(appName)_$(debVersion)_amd64.deb \
-		$(appName)=/usr/sbin/$(appName) \
+		$(appName)=/usr/sbin/$(appName)
+
+	# fpm \
+	#  	-t deb \
+	# 	-s dir \
+	# 	-n $(appName) \
+	# 	--version $(debVersion) \
+	# 	--license LICENSE \
+	# 	--url "http://ca.utio.us" \
+	# 	--category misc \
+	# 	--deb-priority optional \
+	# 	--maintainer "Ceaser Larry <c@utio.us>" \
+	# 	--architecture amd64 \
+	# 	--description "PAC configuration" \
+	# 	--deb-changelog debian/changelog \
+	# 	--after-install debian/$(appName).postinst \
+	# 	--deb-init debian/$(appName).init  \
+	# 	--deb-default debian/$(appName).default \
+	# 	--package $(appName)_$(debVersion)_amd64.deb \
+	# 	$(appName)=/usr/sbin/$(appName)
 
 install: build
-	mv ${appName} $$GOBIN/
+	go install
 
 clean:
 	rm -rf $(BUILD_OBJS)
