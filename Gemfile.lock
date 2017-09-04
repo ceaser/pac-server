@@ -1,6 +1,7 @@
 GIT
-  remote: https://github.com/dsexton/guard-go
-  revision: b021dd210060a0739027faa0e0001b59d28d9acb
+  remote: https://github.com/ceaser/guard-go.git
+  revision: a697b3aa217787f85f22cf2b1d169bee69ec579a
+  branch: release-v0.0.4-a697b3a
   specs:
     guard-go (0.0.5)
       childprocess (>= 0.3)
