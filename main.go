@@ -9,12 +9,12 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/ceaser/pac/internal/version"
+	"github.com/ceaser/pac-server/internal/version"
 )
 
 var (
-	templatePath = flag.String("templatepath", "/usr/share/pac/tmpl", "Folder where html templates are stored")
-	pacFile      = flag.String("pacfile", "/var/spool/pac/pac.js", "Location to store PAC file")
+	templatePath = flag.String("templatepath", "/usr/share/pac-server/tmpl", "Folder where html templates are stored")
+	pacFile      = flag.String("pacfile", "/var/spool/pac-server/pac.js", "Location to store PAC file")
 	addr         = flag.String("address", ":80", "Address and port to bind to")
 )
 

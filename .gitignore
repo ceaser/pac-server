@@ -1,5 +1,5 @@
 *.swp
-pac
+pac-server
 main
 pac.js
 /*.deb

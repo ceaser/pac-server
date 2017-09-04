@@ -1,8 +1,8 @@
 .PHONY: build run stop bash clean distclean push pull
 
-DOCKER_APPNAME=pac
+DOCKER_APPNAME=pac-server
 VERSION=$(shell git describe --tag 2>/dev/null | (grep -Eo "[0-9\.\+\:\~]+-?[0-9]+" | head -n1 || echo 0.0.0))
-BUILD_OBJS=pac_1.0.0_amd64.deb
+BUILD_OBJS=pac-server_0.0.1-7_amd64.deb
 ARGS=-p 80:80
 
 build: $(BUILD_OBJS)
@@ -34,5 +34,5 @@ push:
 pull:
 	docker pull "$(DOCKER_APPNAME):$(VERSION)"
 
-pac_1.0.0_amd64.deb:
-	cp ../pac_1.0.0_amd64.deb .
+$(BUILD_OBJS):
+	cp ../*.deb .
