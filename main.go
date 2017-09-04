@@ -12,17 +12,31 @@ import (
 	"github.com/ceaser/pac/internal/version"
 )
 
+var (
+	templatePath = flag.String("templatepath", "/usr/share/pac/tmpl", "Folder where html templates are stored")
+	pacFile      = flag.String("pacfile", "/var/spool/pac/pac.js", "Location to store PAC file")
+	addr         = flag.String("address", ":80", "Address and port to bind to")
+)
+
 type Page struct {
 	Body    []byte
 	Message string
 }
 
 func (p *Page) save() error {
-	return ioutil.WriteFile("pac.js", p.Body, 0600)
+	log.Println(*pacFile)
+	return ioutil.WriteFile(*pacFile, p.Body, 0600)
+}
+
+func (p *Page) editTemplate(w http.ResponseWriter) {
+	t, _ := template.ParseFiles(*templatePath + "/edit.html")
+	t.Execute(w, p)
 }
 
 func loadPage() (*Page, error) {
-	body, err := ioutil.ReadFile("pac.js")
+	log.Println(*pacFile)
+
+	body, err := ioutil.ReadFile(*pacFile)
 	if err != nil {
 		return nil, err
 	}
@@ -41,8 +55,7 @@ func editHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		p = &Page{}
 	}
-	t, _ := template.ParseFiles("edit.html")
-	t.Execute(w, p)
+	p.editTemplate(w)
 }
 
 func saveHandler(w http.ResponseWriter, r *http.Request) {
@@ -52,8 +65,7 @@ func saveHandler(w http.ResponseWriter, r *http.Request) {
 	err := p.save()
 	if err != nil {
 		p.Message = fmt.Sprintf("Error: %s", err.Error())
-		t, _ := template.ParseFiles("edit.html")
-		t.Execute(w, p)
+		p.editTemplate(w)
 	} else {
 		http.Redirect(w, r, "/", http.StatusFound)
 	}
@@ -68,5 +80,5 @@ func main() {
 	http.HandleFunc("/", viewHandler)
 	http.HandleFunc("/edit/", editHandler)
 	http.HandleFunc("/save/", saveHandler)
-	http.ListenAndServe(":3000", nil)
+	http.ListenAndServe(*addr, nil)
 }

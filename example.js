@@ -1,3 +1,4 @@
+// Tester http://home.thorsen.pm/proxyforurl
 function FindProxyForURL(url, host) {
 
 // If the hostname matches, send direct.
