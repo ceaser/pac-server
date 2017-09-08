@@ -1,15 +1,18 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"html/template"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
+	"os/signal"
+	"time"
 
 	"github.com/ceaser/pac-server/internal/version"
+	"github.com/ceaser/pac-server/logging"
 )
 
 var (
@@ -24,7 +27,6 @@ type Page struct {
 }
 
 func (p *Page) save() error {
-	log.Println(*pacFile)
 	return ioutil.WriteFile(*pacFile, p.Body, 0600)
 }
 
@@ -34,8 +36,6 @@ func (p *Page) editTemplate(w http.ResponseWriter) {
 }
 
 func loadPage() (*Page, error) {
-	log.Println(*pacFile)
-
 	body, err := ioutil.ReadFile(*pacFile)
 	if err != nil {
 		return nil, err
@@ -60,7 +60,6 @@ func editHandler(w http.ResponseWriter, r *http.Request) {
 
 func saveHandler(w http.ResponseWriter, r *http.Request) {
 	body := r.FormValue("body")
-	log.Println(body)
 	p := &Page{Body: []byte(body)}
 	err := p.save()
 	if err != nil {
@@ -71,14 +70,34 @@ func saveHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func missingHandler(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotFound)
+	fmt.Fprint(w, "404")
+}
+
 func main() {
 	flag.Parse()
 	version.ShowVersion()
 
-	log.SetOutput(os.Stdout)
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, os.Interrupt)
 
-	http.HandleFunc("/", viewHandler)
-	http.HandleFunc("/edit/", editHandler)
-	http.HandleFunc("/save/", saveHandler)
-	http.ListenAndServe(*addr, nil)
+	mux := http.DefaultServeMux
+	mux.HandleFunc("/", viewHandler)
+	mux.HandleFunc("/wpad.dat", viewHandler)
+	mux.HandleFunc("/edit/", editHandler)
+	mux.HandleFunc("/save/", saveHandler)
+	mux.HandleFunc("/favicon.ico", missingHandler)
+	loggingHandler := logging.NewApacheLoggingHandler(mux, os.Stdout)
+	server := &http.Server{
+		Addr:    *addr,
+		Handler: loggingHandler,
+	}
+
+	go func() {
+		server.ListenAndServe()
+	}()
+	<-stop
+	ctx, _ := context.WithTimeout(context.Background(), 9*time.Second)
+	server.Shutdown(ctx)
 }
