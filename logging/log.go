@@ -9,7 +9,7 @@ import (
 )
 
 // https://httpd.apache.org/docs/2.2/logs.html#combined + execution time.
-const ApacheFormatPattern = "%s - - [%s] \"%s\" %d %s %d %.4f\n"
+const ApacheFormatPattern = "%s - - [%s] \"%s\" %d %s %s %d %.4f\n"
 
 type ApacheLogRecord struct {
 	http.ResponseWriter
@@ -20,13 +20,22 @@ type ApacheLogRecord struct {
 	status                int
 	responseBytes         int64
 	elapsedTime           time.Duration
+	userAgent             string
 }
 
 func (r *ApacheLogRecord) Log(out io.Writer) {
 	timeFormatted := r.time.Format("02/Jan/2006 03:04:05")
 	requestLine := fmt.Sprintf("%s %s %s", r.method, r.uri, r.protocol)
-	fmt.Fprintf(out, ApacheFormatPattern, r.ip, timeFormatted, requestLine, r.status, r.Header().Get("Etag"), r.responseBytes,
-		r.elapsedTime.Seconds())
+	fmt.Fprintf(out, ApacheFormatPattern,
+		r.ip,
+		timeFormatted,
+		requestLine,
+		r.status,
+		r.Header().Get("Etag"),
+		r.userAgent,
+		r.responseBytes,
+		r.elapsedTime.Seconds(),
+	)
 
 	//timeFormatted := r.time.Format("02/Jan/2006 03:04:05")
 	//	fmt.Fprintf(out, apacheFormatPattern, r.ip, timeFormatted, r.method,
@@ -73,6 +82,7 @@ func (h *ApacheLoggingHandler) ServeHTTP(rw http.ResponseWriter, r *http.Request
 		protocol:       r.Proto,
 		status:         http.StatusOK,
 		elapsedTime:    time.Duration(0),
+		userAgent:      r.UserAgent(),
 	}
 
 	startTime := time.Now()
