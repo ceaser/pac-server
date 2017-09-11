@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"crypto/md5"
+	"encoding/hex"
 	"flag"
 	"fmt"
 	"html/template"
@@ -9,6 +11,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"time"
 
 	"github.com/ceaser/pac-server/internal/version"
@@ -19,11 +22,15 @@ var (
 	templatePath = flag.String("templatepath", "/usr/share/pac-server/tmpl", "Folder where html templates are stored")
 	pacFile      = flag.String("pacfile", "/var/spool/pac-server/pac.js", "Location to store PAC file")
 	addr         = flag.String("address", ":80", "Address and port to bind to")
+	maxAge       = flag.String("maxage", "1600", "Cache Control max-age")
+
+	lastEtag string
 )
 
 type Page struct {
 	Body    []byte
 	Message string
+	Etag    string
 }
 
 func (p *Page) save() error {
@@ -41,12 +48,31 @@ func loadPage() (*Page, error) {
 		return nil, err
 	}
 
-	return &Page{Body: body}, nil
+	page := &Page{Body: body}
+
+	// Generate etag
+	hasher := md5.New()
+	hasher.Write([]byte(page.Body))
+	page.Etag = hex.EncodeToString(hasher.Sum(nil))
+
+	return page, nil
 }
 
 func viewHandler(w http.ResponseWriter, r *http.Request) {
 	p, _ := loadPage()
-	w.Header().Set("Content-Type", "application/javascript; charset=utf-8")
+	e := p.Etag
+
+	// Caching
+	w.Header().Set("Etag", e)
+	w.Header().Set("Cache-Control", "max-age="+*maxAge)
+	if match := r.Header.Get("If-None-Match"); match != "" {
+		if strings.Contains(match, e) {
+			w.WriteHeader(http.StatusNotModified)
+			return
+		}
+	}
+
+	w.Header().Set("Content-Type", "application/x-ns-proxy-autoconfig; charset=utf-8")
 	fmt.Fprintf(w, "%s", p.Body)
 }
 

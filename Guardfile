@@ -1,7 +1,7 @@
 # More info at https://github.com/guard/guard#readme
 
 # guard-go
-guard 'go', :server => 'main.go', :args => %w{-templatepath ./tmpl -pacfile pac.js -address :3000} do
+guard 'go', :server => 'main.go', :args => %w{-templatepath ./tmpl -pacfile pac.js -address :3000 -maxage 30} do
   watch(%r{\.go$})
 end
 
