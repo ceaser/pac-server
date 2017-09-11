@@ -2,11 +2,11 @@
 
 DOCKER_APPNAME=pac-server
 VERSION=$(shell git describe --tag 2>/dev/null | (grep -Eo "[0-9\.\+\:\~]+-?[0-9]+" | head -n1 || echo 0.0.0))
-BUILD_OBJS=pac-server_0.0.1-8_amd64.deb
+BUILD_OBJS=$(DOCKER_APPNAME)_$(VERSION)_amd64.deb
 ARGS=-p 80:80
 
 build: $(BUILD_OBJS)
-	docker build -t "$(DOCKER_APPNAME):$(VERSION)" .
+	docker build --build-arg PKG=$(BUILD_OBJS) -t "$(DOCKER_APPNAME):$(VERSION)" .
 	rm $(BUILD_OBJS)
 
 run:

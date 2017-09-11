@@ -1,7 +1,10 @@
 FROM ubuntu
 
-COPY pac-server_0.0.1-8_amd64.deb .
-RUN dpkg -i pac-server_0.0.1-8_amd64.deb
+ARG PKG=pac-server_0.0.1_amd64.deb
+
+RUN echo ${PKG}
+COPY ${PKG} .
+RUN dpkg -i ${PKG}
 
 EXPOSE 80/tcp
 CMD /usr/sbin/pac-server

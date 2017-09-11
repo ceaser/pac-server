@@ -31,6 +31,9 @@ deb: clean
 install: build
 	go install
 
+docker: deb
+	$(MAKE) -C docker
+
 clean:
 	rm -rf $(BUILD_OBJS)
 
