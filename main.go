@@ -58,7 +58,8 @@ func loadPage() (*Page, error) {
 	return page, nil
 }
 
-func viewHandler(w http.ResponseWriter, r *http.Request) {
+func wpadHandler(w http.ResponseWriter, r *http.Request) {
+	// TODO: Refactor duplication between wpadHandler and viewHandler
 	p, _ := loadPage()
 	e := p.Etag
 
@@ -73,6 +74,23 @@ func viewHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/x-ns-proxy-autoconfig; charset=utf-8")
+	fmt.Fprintf(w, "%s", p.Body)
+}
+
+func viewHandler(w http.ResponseWriter, r *http.Request) {
+	p, _ := loadPage()
+	e := p.Etag
+
+	// Caching
+	w.Header().Set("Etag", e)
+	w.Header().Set("Cache-Control", "max-age="+*maxAge)
+	if match := r.Header.Get("If-None-Match"); match != "" {
+		if strings.Contains(match, e) {
+			w.WriteHeader(http.StatusNotModified)
+			return
+		}
+	}
+
 	fmt.Fprintf(w, "%s", p.Body)
 }
 
@@ -110,7 +128,7 @@ func main() {
 
 	mux := http.DefaultServeMux
 	mux.HandleFunc("/", viewHandler)
-	mux.HandleFunc("/wpad.dat", viewHandler)
+	mux.HandleFunc("/wpad.dat", wpadHandler)
 	mux.HandleFunc("/edit/", editHandler)
 	mux.HandleFunc("/save/", saveHandler)
 	mux.HandleFunc("/favicon.ico", missingHandler)
