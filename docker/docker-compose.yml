@@ -1,0 +1,12 @@
+pac-server:
+  build: .
+  dockerfile: Dockerfile
+  container_name: pac
+  hostname: pac
+  ports:
+    - "3000:80/tcp"
+  volumes:
+    - "./pac.js:/var/spool/pac-server/pac.js"
+  log_opt:
+    max-size: "100k"
+    max-file: "20"
