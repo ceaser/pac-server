@@ -35,5 +35,10 @@ docker: deb
 	$(MAKE) -C docker
 
 clean:
-	rm -rf $(BUILD_OBJS)
+	-$(MAKE) -C docker clean
+	-rm -rf $(BUILD_OBJS) 2>/dev/null 1>&2
+
+distclean: clean
+	-$(MAKE) -C docker distclean
+
 

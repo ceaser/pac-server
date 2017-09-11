@@ -1,6 +1,6 @@
 FROM ubuntu
 
-ARG PKG=pac-server_0.0.1_amd64.deb
+ARG PKG=pac-server_*_amd64.deb
 
 RUN echo ${PKG}
 COPY ${PKG} .
