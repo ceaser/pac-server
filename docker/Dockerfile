@@ -7,5 +7,5 @@ COPY ${PKG} .
 RUN dpkg -i ${PKG}
 
 EXPOSE 80/tcp
-CMD /usr/sbin/pac-server
+ENTRYPOINT /usr/sbin/pac-server
 
